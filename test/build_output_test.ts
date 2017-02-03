@@ -3,18 +3,21 @@ import { buildOutput, Output, Tree } from "../index";
 const Fixturify: any = require("broccoli-fixturify");
 
 describe("buildOutput", () => {
+  let fixture: Tree;
   let subject: Output;
-  const fixture: Tree = {
-    "hello.txt": "hello world",
-    "lib": {
-      "more.txt": "even more"
-    }
-  };
-  const outputNode = new Fixturify(fixture);
 
-  beforeEach(() => buildOutput(outputNode).then(output => {
-    subject = output;
-  }));
+  beforeEach(() => {
+    fixture = {
+      "hello.txt": "hello world",
+      "lib": {
+        "more.txt": "even more"
+      }
+    };
+    let outputNode = new Fixturify(fixture);
+    return buildOutput(outputNode).then(output => {
+      subject = output;
+    });
+  });
 
   afterEach(() => subject.dispose());
 
