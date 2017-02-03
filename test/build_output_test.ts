@@ -47,14 +47,10 @@ describe("buildOutput", () => {
       "lib/more.txt": "create"
     });
 
+    fixture["hello.txt"] = "goodbye";
+    fixture["lib"] = null;
+
     return subject.rebuild().then(output => {
-      expect( subject.changes() ).to.deep.equal({ });
-
-      fixture["hello.txt"] = "goodbye";
-      fixture["lib"] = null;
-
-      return output.rebuild();
-    }).then(output => {
       expect(
         output.changes()
       ).to.deep.equal({
