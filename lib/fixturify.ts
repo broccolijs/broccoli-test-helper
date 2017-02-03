@@ -1,7 +1,7 @@
-import { Directory } from "./interfaces";
+import { Tree } from "./interfaces";
 const fixturify: {
-  readSync(path: string): Directory;
-  writeSync(path: string, content: Directory): void;
+  readSync(path: string): Tree;
+  writeSync(path: string, content: Tree): void;
 } = require("fixturify");
 export const readSync = fixturify.readSync;
 export const writeSync = fixturify.writeSync;

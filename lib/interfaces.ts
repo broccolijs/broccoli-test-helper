@@ -18,7 +18,7 @@ export interface Output {
    *
    * @param from - a sub path to read from within the TempDir.
    */
-  read(from?: string): Directory;
+  read(from?: string): Tree;
 
   /**
    * Return output path.
@@ -68,10 +68,10 @@ export interface TempDir {
    * @param content - the content to write to the tmp dir.
    * @param to - a sub path to write to within the tmp dir.
    */
-  write(content: Directory, to?: string): void;
+  write(content: Tree, to?: string): void;
 
   /**
-   * Copy directory contents to input.
+   * Copy contents to tmp dir.
    *
    * @param from - a directory to copy from.
    * @param to - a sub path to write to within the tmp dir.
@@ -83,14 +83,14 @@ export interface TempDir {
    *
    * @param from - a sub path to read from within the tmp dir.
    */
-  read(from?: string): Directory;
+  read(from?: string): Tree;
 
   /**
    * Returns the tmp dir path.
    *
    * @param subpath - subpath to join with the tmp dir.
    */
-  path(subpath: string): string;
+  path(subpath?: string): string;
 
   /**
    * Deletes the tmp dir.
@@ -101,9 +101,9 @@ export interface TempDir {
 /**
  * Represents a directory's contents.
  */
-export interface Directory {
+export interface Tree {
   /**
    * Map directory entry to a Directory or file contents or null (delete when writing directory).
    */
-  [fileName: string]: Directory | string | null | undefined;
+  [fileName: string]: Tree | string | null | undefined;
 }

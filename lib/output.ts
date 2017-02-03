@@ -11,7 +11,7 @@ export default class Output implements t.Output {
     this.treeDiff = new TreeDiff(builder.outputPath);
   }
 
-  read(from?: string): t.Directory {
+  read(from?: string): t.Tree {
     return readSync(this.path(from));
   }
 

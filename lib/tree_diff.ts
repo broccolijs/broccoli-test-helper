@@ -4,7 +4,6 @@ const walkSync: WalkSync = require("walk-sync");
 const FSTree: FSTree.Static = require("fs-tree-diff");
 
 interface WalkSync {
-  (path: string, options?: WalkSync.Options): string[];
   entries(path: string, options?: WalkSync.Options): WalkSync.Entry[];
 }
 
