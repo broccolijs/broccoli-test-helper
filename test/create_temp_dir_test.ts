@@ -72,7 +72,7 @@ describe("createTempDir", () => {
   });
 
   it("should support copy from fixture path", () => {
-    subject.copy("test/fixture");
+    subject.copy("test/fixtures/a");
 
     expect(
       fs.readdirSync(subject.path())
@@ -98,7 +98,7 @@ describe("createTempDir", () => {
       "export class A {}\n"
     );
 
-    subject.copy("test/fixture", "lib");
+    subject.copy("test/fixtures/a", "lib");
 
     expect(
       fs.readdirSync(subject.path("lib"))
