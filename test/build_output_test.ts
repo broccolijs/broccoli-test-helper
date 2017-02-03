@@ -47,12 +47,16 @@ describe("buildOutput", () => {
       "lib/more.txt": "create"
     });
 
-    fixture["hello.txt"] = "goodbye";
-    fixture["lib"] = null;
+    return subject.rebuild().then(output => {
+      expect( subject.changes() ).to.deep.equal({ });
 
-    return subject.rebuild().then(() => {
+      fixture["hello.txt"] = "goodbye";
+      fixture["lib"] = null;
+
+      return output.rebuild();
+    }).then(output => {
       expect(
-        subject.changes()
+        output.changes()
       ).to.deep.equal({
         "lib/more.txt": "unlink",
         "lib/": "rmdir",
@@ -60,7 +64,7 @@ describe("buildOutput", () => {
       });
 
       expect(
-        subject.read()
+        output.read()
       ).to.deep.equal({
         "hello.txt": "goodbye"
       });

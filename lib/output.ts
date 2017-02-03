@@ -24,9 +24,10 @@ export default class Output implements t.Output {
     return this.treeDiff.changes;
   }
 
-  rebuild(): rsvp.Promise<void> {
+  rebuild(): rsvp.Promise<t.Output> {
     return this.builder.build().then(() => {
       this.treeDiff.recompute();
+      return this;
     });
   }
 

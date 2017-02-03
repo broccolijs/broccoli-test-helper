@@ -35,7 +35,7 @@ export interface Output {
   /**
    * Rebuild output.
    */
-  rebuild(): rsvp.Promise<void>;
+  rebuild(): rsvp.Promise<Output>;
 
   /**
    * Cleanup builder;
