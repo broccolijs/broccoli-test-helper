@@ -20,7 +20,7 @@ export default class Output implements t.Output {
     return subpath ? join(outputPath, subpath) : outputPath;
   }
 
-  changes(): Array<t.Change> {
+  changes(): t.Changes {
     return this.treeDiff.changes;
   }
 

@@ -30,7 +30,7 @@ export interface Output {
   /**
    * Get changes from last build.
    */
-  changes(): Array<Change>;
+  changes(): Changes;
 
   /**
    * Rebuild output.
@@ -44,18 +44,10 @@ export interface Output {
 }
 
 /**
- * Represents a change in output.
+ * Represents changes in output.
  */
-export interface Change {
-  /**
-   * Change type.
-   */
-  type: "create" | "mkdir" | "unlink" | "rmdir" | "change";
-
-  /**
-   * Relative path.
-   */
-  path: string;
+export interface Changes {
+  [path: string]: "unlink" | "create" | "mkdir" | "rmdir" | "change"
 }
 
 /**

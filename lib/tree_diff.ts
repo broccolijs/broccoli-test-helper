@@ -1,4 +1,4 @@
-import { Change } from "./interfaces";
+import { Changes } from "./interfaces";
 
 const walkSync: WalkSync = require("walk-sync");
 const FSTree: FSTree.Static = require("fs-tree-diff");
@@ -42,26 +42,24 @@ namespace FSTree {
 export default class TreeDiff {
   private last: FSTree;
   private current: FSTree;
-  public changes: Change[];
+  public changes: Changes;
 
   constructor(private path: string) {
     this.last = FSTree.fromEntries([]);
     this.current = FSTree.fromEntries([]);
-    this.changes = [];
+    this.changes = {};
     this.recompute();
   }
 
   recompute(): void {
     let last = this.last = this.current;
     let current = this.current = FSTree.fromEntries(walkSync.entries(this.path));
-    let changes = this.changes;
-    changes.length = 0;
+    let changes: Changes = this.changes = {};
     let patch = last.calculatePatch(current);
     for (let i = 0; i < patch.length; i++) {
-      changes.push({
-        type: patch[i][0],
-        path: patch[i][1]
-      });
+      let op = patch[i][0];
+      let path = patch[i][1];
+      changes[path] = op;
     }
   }
 }

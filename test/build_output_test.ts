@@ -38,16 +38,11 @@ describe("buildOutput", () => {
   it("should support changes on build and rebuild", () => {
     expect(
       subject.changes()
-    ).to.deep.equal([{
-      "type": "create",
-      "path": "hello.txt"
-    }, {
-      "type": "mkdir",
-      "path": "lib/"
-    }, {
-      "type": "create",
-      "path": "lib/more.txt"
-    }]);
+    ).to.deep.equal({
+      "hello.txt": "create",
+      "lib/": "mkdir",
+      "lib/more.txt": "create"
+    });
 
     fixture["hello.txt"] = "goodbye";
     fixture["lib"] = null;
@@ -55,16 +50,11 @@ describe("buildOutput", () => {
     return subject.rebuild().then(() => {
       expect(
         subject.changes()
-      ).to.deep.equal([{
-        "type": "unlink",
-        "path": "lib/more.txt"
-      }, {
-        "type": "rmdir",
-        "path": "lib/"
-      }, {
-        "type": "change",
-        "path": "hello.txt"
-      }]);
+      ).to.deep.equal({
+        "lib/more.txt": "unlink",
+        "lib/": "rmdir",
+        "hello.txt": "change"
+      });
 
       expect(
         subject.read()
