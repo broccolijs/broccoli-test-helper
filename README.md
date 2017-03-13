@@ -11,13 +11,18 @@ import MyBroccoliPlugin from "../index";
 
 describe("MyBroccoliPlugin", () => {
   let input;
+  let output;
+  let subject;
 
   beforeEach(async () => {
     input = await createTempDir();
+    subject = new MyBroccoliPlugin(input.path());
+    output = createBuilder(subject);
   });
 
   afterEach(async () => {
-    await input.dispose()
+    await input.dispose();
+    await output.dispose();
   });
 
   it("should build", async () => {
@@ -29,10 +34,6 @@ describe("MyBroccoliPlugin", () => {
         "c.js": `export class C {};`
       }
     });
-
-    let output = createBuilder(
-      new MyBroccoliPlugin(input.path())
-    );
 
     await output.build();
 
