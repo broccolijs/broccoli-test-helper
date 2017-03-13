@@ -6,19 +6,21 @@ Test helpers for BroccoliPlugins that make testing build and rebuild behavior de
 
 ```js
 import { expect } from "chai";
-import { buildOutput, createTempDir } from "broccoli-test-helper";
+import { createBuilder, createTempDir } from "broccoli-test-helper";
 import MyBroccoliPlugin from "../index";
 
 describe("MyBroccoliPlugin", () => {
   let input;
 
-  beforeEach(() => createTempDir().then(tempDir => {
-    input = tempDir;
-  }));
+  beforeEach(async () => {
+    input = await createTempDir();
+  });
 
-  afterEach(() => input.dispose());
+  afterEach(async () => {
+    await input.dispose()
+  });
 
-  it("should build", () => {
+  it("should build", async () => {
     input.write({
       "index.js": `export { A } from "./lib/a";`
       "lib": {
@@ -28,44 +30,51 @@ describe("MyBroccoliPlugin", () => {
       }
     });
 
-    return buildOutput(
+    let output = createBuilder(
       new MyBroccoliPlugin(input.path())
-    ).then(output => {
-      expect(
-        output.read()
-      ).to.deep.equal({
-        "index.js": `exports.A = require("./lib/a").A;`,
-        "lib": {
-          "a.js": `exports.A = class A {};`,
-          "b.js": `exports.B = class B {};`,
-          "c.js": `exports.C = class C {};`
-        }
-      });
+    );
 
-      // rebuild noop
-      return output.rebuild();
-    }).then(output => {
-      expect( output.changes() ).to.deep.equal({ });
+    await output.build();
 
-      input.write({
-        "index.js": "export class A {};",
-        "lib": null // delete dir
-      });
+    expect(
+      output.read()
+    ).to.deep.equal({
+      "index.js": `exports.A = require("./lib/a").A;`,
+      "lib": {
+        "a.js": `exports.A = class A {};`,
+        "b.js": `exports.B = class B {};`,
+        "c.js": `exports.C = class C {};`
+      }
+    });
 
-      // rebuild changes
-      return output.rebuild();
-    }).then(output => {
-      expect( output.changes() ).to.deep.equal({
-        "lib/c.js": "unlink",
-        "lib/b.js": "unlink",
-        "lib/a.js": "unlink",
-        "lib/":     "rmdir",
-        "index.js": "change"
-      });
+    await output.build();
 
-      expect( output.read() ).to.deep.equal({
-        "index.js": `exports.A = class A {};`
-      });
+    expect(
+      output.changes()
+    ).to.deep.equal({
+    });
+
+    input.write({
+      "index.js": "export class A {};",
+      "lib": null // delete dir
+    });
+
+    await output.build();
+
+    expect(
+      output.changes()
+    ).to.deep.equal({
+      "lib/c.js": "unlink",
+      "lib/b.js": "unlink",
+      "lib/a.js": "unlink",
+      "lib/":     "rmdir",
+      "index.js": "change"
+    });
+
+    expect(
+      output.read()
+    ).to.deep.equal({
+      "index.js": `exports.A = class A {};`
     });
   });
 });

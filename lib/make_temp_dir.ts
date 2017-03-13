@@ -1,6 +1,6 @@
-import * as rsvp from "rsvp";
-import { join } from "path";
 import * as os from "os";
+import { join } from "path";
+import * as rsvp from "rsvp";
 
 const mktemp: {
   createDir(template: string, callback: (err: Error, path: string) => void): string;

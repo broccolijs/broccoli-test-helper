@@ -1,57 +1,25 @@
-import { Changes } from "./interfaces";
+import { ChangeOp, Changes } from "./interfaces";
 
-const walkSync: WalkSync = require("walk-sync");
-const FSTree: FSTree.Static = require("fs-tree-diff");
-
-interface WalkSync {
-  entries(path: string, options?: WalkSync.Options): WalkSync.Entry[];
-}
-
-namespace WalkSync {
-  export type Options = {
-    globs?: (string | { match(): boolean })[];
-  };
-
-  export interface Entry {
-    relativePath: string;
-    basePath: string;
-    fullPath: string;
-    mode: number;
-    size: number;
-    mtime: Date;
-    isDirectory(): boolean;
-  }
-}
-
-interface FSTree {
-  calculatePatch(next: FSTree, isUnchanged?: (a: WalkSync.Entry, b: WalkSync.Entry) => {}): FSTree.PatchOp[];
-}
-
-namespace FSTree {
-  export type Op = "unlink" | "create" | "mkdir" | "rmdir" | "change";
-
-  export type PatchOp = [Op, string, WalkSync.Entry];
-
-  export interface Static {
-    fromEntries(entries: WalkSync.Entry[], options?: {
-      sortAndExpand?: boolean
-    }): FSTree;
-  }
-}
+const walkSync: {
+  entries(path: string): Entry[];
+} = require("walk-sync");
+const FSTree: {
+  fromEntries(entries: Entry[]): FSTree;
+} = require("fs-tree-diff");
 
 export default class TreeDiff {
+  public changes: Changes;
+
   private last: FSTree;
   private current: FSTree;
-  public changes: Changes;
 
   constructor(private path: string) {
     this.last = FSTree.fromEntries([]);
     this.current = FSTree.fromEntries([]);
     this.changes = {};
-    this.recompute();
   }
 
-  recompute(): void {
+  public recompute(): void {
     let last = this.last = this.current;
     let current = this.current = FSTree.fromEntries(walkSync.entries(this.path));
     let changes: Changes = this.changes = {};
@@ -62,4 +30,18 @@ export default class TreeDiff {
       changes[path] = op;
     }
   }
+}
+
+interface Entry {
+  relativePath: string;
+  basePath: string;
+  fullPath: string;
+  mode: number;
+  size: number;
+  mtime: Date;
+  isDirectory(): boolean;
+}
+
+interface FSTree {
+  calculatePatch(next: FSTree): Array<[ChangeOp, string, Entry]>;
 }

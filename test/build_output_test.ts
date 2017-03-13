@@ -1,12 +1,12 @@
 import { expect } from "chai";
-import { buildOutput, Output, Tree } from "../index";
+import { createBuilder, Output, Tree } from "../index";
 const Fixturify: any = require("broccoli-fixturify");
 
 describe("buildOutput", () => {
   let fixture: Tree;
   let subject: Output;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     fixture = {
       "hello.txt": "hello world",
       "lib": {
@@ -14,14 +14,18 @@ describe("buildOutput", () => {
       }
     };
     let outputNode = new Fixturify(fixture);
-    return buildOutput(outputNode).then(output => {
-      subject = output;
-    });
+    subject = createBuilder(outputNode);
   });
 
   afterEach(() => subject.dispose());
 
-  it("should support read", () => {
+  it("should support read", async () => {
+    expect(
+      subject.read()
+    ).to.deep.equal({});
+
+    await subject.build();
+
     expect(
       subject.read()
     ).to.deep.equal({
@@ -38,7 +42,13 @@ describe("buildOutput", () => {
     });
   });
 
-  it("should support changes on build and rebuild", () => {
+  it("should support changes on build and rebuild", async () => {
+    expect(
+      subject.changes()
+    ).to.deep.equal({});
+
+    await subject.build();
+
     expect(
       subject.changes()
     ).to.deep.equal({
@@ -48,28 +58,31 @@ describe("buildOutput", () => {
     });
 
     fixture["hello.txt"] = "goodbye";
+    // tslint:disable-next-line no-string-literal
     fixture["lib"] = null;
 
-    return subject.rebuild().then(output => {
-      expect(
-        output.changes()
-      ).to.deep.equal({
-        "lib/more.txt": "unlink",
-        "lib/": "rmdir",
-        "hello.txt": "change"
-      });
+    await subject.build();
 
-      expect(
-        output.read()
-      ).to.deep.equal({
-        "hello.txt": "goodbye"
-      });
+    expect(
+      subject.changes()
+    ).to.deep.equal({
+      "lib/more.txt": "unlink",
+      // tslint:disable-next-line object-literal-sort-keys
+      "lib/": "rmdir",
+      "hello.txt": "change"
+    });
+
+    expect(
+      subject.read()
+    ).to.deep.equal({
+      "hello.txt": "goodbye"
     });
   });
 
-  it("support cleanup builder on dispose", () => {
-    return subject.dispose().then(() => {
-      expect(() => subject.read()).to.throw(/ENOENT/);
-    });
+  it("support cleanup builder on dispose", async () => {
+    await subject.dispose();
+
+    // output path is gone
+    expect(() => subject.read()).to.throw(/ENOENT/);
   });
 });

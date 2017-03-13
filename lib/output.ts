@@ -1,8 +1,8 @@
-import * as rsvp from "rsvp";
 import { join } from "path";
+import * as rsvp from "rsvp";
+import { readSync } from "./fixturify";
 import * as t from "./interfaces";
 import TreeDiff from "./tree_diff";
-import { readSync } from "./fixturify";
 
 export default class Output implements t.Output {
   private treeDiff: TreeDiff;
@@ -11,27 +11,34 @@ export default class Output implements t.Output {
     this.treeDiff = new TreeDiff(builder.outputPath);
   }
 
-  read(from?: string): t.Tree {
+  public read(from?: string): t.Tree {
     return readSync(this.path(from));
   }
 
-  path(subpath?: string): string {
+  public path(subpath?: string): string {
     let outputPath = this.builder.outputPath;
     return subpath ? join(outputPath, subpath) : outputPath;
   }
 
-  changes(): t.Changes {
+  public changes(): t.Changes {
     return this.treeDiff.changes;
   }
 
-  rebuild(): rsvp.Promise<t.Output> {
+  public build(): rsvp.Promise<void> {
     return this.builder.build().then(() => {
       this.treeDiff.recompute();
-      return this;
     });
   }
 
-  dispose(): rsvp.Promise<void> {
+  /**
+   * @deprecated
+   */
+  public rebuild(): rsvp.Promise<t.Output> {
+    console.warn(`rebuilt() is deprecated, just call build() any.`);
+    return this.build().then(() => this);
+  }
+
+  public dispose(): rsvp.Promise<void> {
     return rsvp.Promise.resolve(this.builder.cleanup());
   }
 }

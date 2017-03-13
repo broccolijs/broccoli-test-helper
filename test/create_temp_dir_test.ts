@@ -1,15 +1,17 @@
 import { expect } from "chai";
-import { createTempDir, TempDir } from "../index";
 import * as fs from "fs";
+import { createTempDir, TempDir } from "../index";
 
 describe("createTempDir", () => {
   let subject: TempDir;
 
-  beforeEach(() => createTempDir().then(tempDir => {
-    subject = tempDir;
-  }));
+  beforeEach(async () => {
+    subject = await createTempDir();
+  });
 
-  afterEach(() => subject.dispose());
+  afterEach(async () => {
+    await subject.dispose();
+  });
 
   it("should support writing", () => {
     subject.write({
@@ -40,6 +42,7 @@ describe("createTempDir", () => {
     );
 
     subject.write({
+      // tslint:disable-next-line object-literal-key-quotes
       "lib": null
     });
 
@@ -125,9 +128,10 @@ describe("createTempDir", () => {
     );
   });
 
-  it("should remove tmp dir on dispose", () => {
-    return subject.dispose().then(() => {
-      expect(() => subject.read()).to.throw(/ENOENT/);
-    });
+  it("should remove tmp dir on dispose", async () => {
+    await subject.dispose();
+    expect(() => {
+      subject.read();
+    }).to.throw(/ENOENT/);
   });
 });

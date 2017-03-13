@@ -8,15 +8,16 @@
   "license": "MIT",
   "scripts": {
     "prepublish": "tsc",
-    "test": "tsc && mocha dist/test/"
+    "build": "tsc",
+    "test": "mocha dist/test/"
   },
   "homepage": "https://github.com/krisselden/broccoli-test-helper",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/krisselden/broccoli-test-helper.git"
+    "type": "git",
+    "url": "https://github.com/krisselden/broccoli-test-helper.git"
   },
   "bugs": {
-    "url" : "https://github.com/krisselden/broccoli-test-helper/issues"
+    "url": "https://github.com/krisselden/broccoli-test-helper/issues"
   },
   "files": [
     "dist",
@@ -30,8 +31,8 @@
     "broccoli-fixturify": "^0.3.0",
     "chai": "^3.5.0",
     "mocha": "^3.2.0",
-    "tslint": "^4.4.2",
-    "typescript": "^2.1.5"
+    "tslint": "^4.5.1",
+    "typescript": "^2.2.1"
   },
   "dependencies": {
     "@types/rsvp": "^3.0.0",

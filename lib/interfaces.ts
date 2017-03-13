@@ -1,31 +1,55 @@
 import * as rsvp from "rsvp";
 
+/**
+ * Interface expected by the output test helper for a builder.
+ */
 export interface Builder {
+  /**
+   * Path to output of builder.
+   */
   outputPath: string;
 
+  /**
+   * Builds output.
+   */
   build(): rsvp.Promise<void>;
+
+  /**
+   * Cleanup temporary build artifacts.
+   *
+   * Current version is void return but reserves the possibility of
+   * returning a promise in the future so the test helper just always
+   * returns a promise for dispose.
+   */
   cleanup(): rsvp.Promise<void> | void;
 }
 
-export interface Output {
-  /**
-   * Return the builder.
-   */
-  builder: Builder;
+export interface Disposable {
+  dispose(): rsvp.Promise<void>;
+}
 
+export interface ReadableDir {
   /**
-   * Read output directory (does not support non text files).
-   *
-   * @param from - a sub path to read from within the TempDir.
+   * Read the content of the directory.
+   * @param from - a relative path to read from within the directory.
    */
   read(from?: string): Tree;
 
   /**
-   * Return output path.
-   *
-   * @param subpath - subpath to join with output.
+   * Returns the absolute path to the directory.
+   * @param subpath - subpath within the directory.
    */
   path(subpath?: string): string;
+}
+
+/**
+ * Test helper for building output and making assertions.
+ */
+export interface Output extends ReadableDir, Disposable {
+  /**
+   * Return the builder.
+   */
+  builder: Builder;
 
   /**
    * Get changes from last build.
@@ -33,62 +57,51 @@ export interface Output {
   changes(): Changes;
 
   /**
-   * Rebuild output.
+   * Build output.
+   * @deprecated
    */
   rebuild(): rsvp.Promise<Output>;
 
   /**
-   * Cleanup builder;
+   * Build output.
    */
-  dispose(): rsvp.Promise<void>;
+  build(): rsvp.Promise<void>;
 }
+
+/**
+ * Change operation.
+ */
+export type ChangeOp = "unlink" | "create" | "mkdir" | "rmdir" | "change";
 
 /**
  * Represents changes in output.
  */
 export interface Changes {
-  [path: string]: "unlink" | "create" | "mkdir" | "rmdir" | "change"
+  [path: string]: ChangeOp;
 }
 
 /**
- * Represents a tmp directory to write fixture data to for input.
+ * A disposable temporary directory for writing mutable fixture data to.
  */
-export interface TempDir {
+export interface TempDir extends ReadableDir, Disposable {
   /**
-   * Write to the tmp dir.
+   * Write to the temporary directory.
    *
-   * @param content - the content to write to the tmp dir.
-   * @param to - a sub path to write to within the tmp dir.
+   * @param content - the content to write to the temporary directory.
+   * @param to - a sub path to write to within the temporary directory.
    */
   write(content: Tree, to?: string): void;
 
   /**
-   * Copy contents to tmp dir.
+   * Copy contents of a directory to the temporary directory.
    *
    * @param from - a directory to copy from.
-   * @param to - a sub path to write to within the tmp dir.
+   * @param to - a sub path to write to within the temporary directory.
    */
   copy(from: string, to?: string): void;
-
-  /**
-   * Read the tmp dir.
-   *
-   * @param from - a sub path to read from within the tmp dir.
-   */
-  read(from?: string): Tree;
-
-  /**
-   * Returns the tmp dir path.
-   *
-   * @param subpath - subpath to join with the tmp dir.
-   */
-  path(subpath?: string): string;
-
-  /**
-   * Deletes the tmp dir.
-   */
-  dispose(): rsvp.Promise<void>;
 }
+
+export type TreeEntry = Tree | string | null;
 
 /**
  * Represents a directory's contents.
@@ -97,5 +110,5 @@ export interface Tree {
   /**
    * Map directory entry to a Directory or file contents or null (delete when writing directory).
    */
-  [fileName: string]: Tree | string | null | undefined;
+  [name: string]: TreeEntry | undefined;
 }
