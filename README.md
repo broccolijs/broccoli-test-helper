@@ -27,7 +27,7 @@ describe("MyBroccoliPlugin", () => {
 
   it("should build", async () => {
     input.write({
-      "index.js": `export { A } from "./lib/a";`
+      "index.js": `export { A } from "./lib/a";`,
       "lib": {
         "a.js": `export class A {};`,
         "b.js": `export class B {};`,
