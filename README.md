@@ -9,23 +9,23 @@ import { expect } from "chai";
 import { createBuilder, createTempDir } from "broccoli-test-helper";
 import MyBroccoliPlugin from "../index";
 
-describe("MyBroccoliPlugin", () => {
+describe("MyBroccoliPlugin", function() {
   let input;
   let output;
   let subject;
 
-  beforeEach(async () => {
+  beforeEach(async function() {
     input = await createTempDir();
     subject = new MyBroccoliPlugin(input.path());
     output = createBuilder(subject);
   });
 
-  afterEach(async () => {
+  afterEach(async function() {
     await input.dispose();
     await output.dispose();
   });
 
-  it("should build", async () => {
+  it("should build", async function() {
     input.write({
       "index.js": `export { A } from "./lib/a";`,
       "lib": {
