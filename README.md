@@ -5,27 +5,32 @@
 Test helpers for BroccoliPlugins that make testing build and rebuild behavior dead simple and expect diff friendly.
 
 ```js
-import { expect } from "chai";
-import { createBuilder, createTempDir } from "broccoli-test-helper";
-import MyBroccoliPlugin from "../index";
+'use strict';
+
+const expect = require('chai').expect;
+const helpers = require('broccoli-test-helper');
+const createBuilder = helpers.createBuilder;
+const createTempDir = helpers.createTempDir;
+const MyBroccoliPlugin = require("../index");
+const co = require('co');
 
 describe("MyBroccoliPlugin", function() {
   let input;
   let output;
   let subject;
 
-  beforeEach(async function() {
-    input = await createTempDir();
+  beforeEach(co.wrap(function* () {
+    input = yield createTempDir();
     subject = new MyBroccoliPlugin(input.path());
     output = createBuilder(subject);
-  });
+  }));
 
-  afterEach(async function() {
-    await input.dispose();
-    await output.dispose();
-  });
+  afterEach(co.wrap(function* () {
+    yield input.dispose();
+    yield output.dispose();
+  }));
 
-  it("should build", async function() {
+  it("should build", co.wrap(function* () {
     input.write({
       "index.js": `export { A } from "./lib/a";`,
       "lib": {
@@ -35,7 +40,7 @@ describe("MyBroccoliPlugin", function() {
       }
     });
 
-    await output.build();
+    yield output.build();
 
     expect(
       output.read()
@@ -48,19 +53,18 @@ describe("MyBroccoliPlugin", function() {
       }
     });
 
-    await output.build();
+    yield output.build();
 
     expect(
       output.changes()
-    ).to.deep.equal({
-    });
+    ).to.deep.equal({ });
 
     input.write({
       "index.js": "export class A {};",
       "lib": null // delete dir
     });
 
-    await output.build();
+    yield output.build();
 
     expect(
       output.changes()
@@ -77,6 +81,6 @@ describe("MyBroccoliPlugin", function() {
     ).to.deep.equal({
       "index.js": `exports.A = class A {};`
     });
-  });
+  }));
 });
 ```
