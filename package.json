@@ -11,13 +11,13 @@
     "build": "tsc",
     "test": "mocha dist/test/"
   },
-  "homepage": "https://github.com/krisselden/broccoli-test-helper",
+  "homepage": "https://github.com/broccolijs/broccoli-test-helper",
   "repository": {
     "type": "git",
-    "url": "https://github.com/krisselden/broccoli-test-helper.git"
+    "url": "https://github.com/broccolijs/broccoli-test-helper.git"
   },
   "bugs": {
-    "url": "https://github.com/krisselden/broccoli-test-helper/issues"
+    "url": "https://github.com/broccolijs/broccoli-test-helper/issues"
   },
   "files": [
     "dist",
