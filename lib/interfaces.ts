@@ -1,5 +1,3 @@
-import * as rsvp from "rsvp";
-
 /**
  * Interface expected by the output test helper for a builder.
  */
@@ -12,7 +10,7 @@ export interface Builder {
   /**
    * Builds output.
    */
-  build(): rsvp.Promise<void>;
+  build(): Promise<void>;
 
   /**
    * Cleanup temporary build artifacts.
@@ -21,11 +19,11 @@ export interface Builder {
    * returning a promise in the future so the test helper just always
    * returns a promise for dispose.
    */
-  cleanup(): rsvp.Promise<void> | void;
+  cleanup(): Promise<void> | void;
 }
 
 export interface Disposable {
-  dispose(): rsvp.Promise<void>;
+  dispose(): Promise<void>;
 }
 
 export interface ReadableDir {
@@ -60,12 +58,12 @@ export interface Output extends ReadableDir, Disposable {
    * Build output.
    * @deprecated
    */
-  rebuild(): rsvp.Promise<Output>;
+  rebuild(): Promise<Output>;
 
   /**
    * Build output.
    */
-  build(): rsvp.Promise<void>;
+  build(): Promise<void>;
 }
 
 /**
