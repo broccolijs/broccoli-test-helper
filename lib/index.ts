@@ -1,4 +1,3 @@
-import * as rsvp from "rsvp";
 import * as t from "./interfaces";
 export { Builder } from "./interfaces";
 import makeTempDir from "./make_temp_dir";
@@ -17,7 +16,7 @@ export function createReadableDir(dir: string): t.ReadableDir {
 /**
  * Create temporary dir.
  */
-export function createTempDir(): rsvp.Promise<t.TempDir> {
+export function createTempDir(): Promise<t.TempDir> {
   return makeTempDir().then((dir) => {
     return new TempDir(dir);
   });
@@ -46,7 +45,7 @@ export function createBuilder(outputNode: any): t.Output {
  * promise for the initial build.
  * @param outputNode
  */
-export function buildOutput(outputNode: any): rsvp.Promise<t.Output> {
+export function buildOutput(outputNode: any): Promise<t.Output> {
   let output = createBuilder(outputNode);
   return output.build().then(() => output);
 }

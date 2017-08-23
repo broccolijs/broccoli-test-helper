@@ -1,5 +1,4 @@
 import * as rimraf from "rimraf";
-import * as rsvp from "rsvp";
 import { readSync, writeSync  } from "./fixturify";
 import * as t from "./interfaces";
 import ReadableDir from "./readable_dir";
@@ -17,8 +16,8 @@ export default class TempDir extends ReadableDir implements t.TempDir {
     writeSync(this.path(to), readSync(from));
   }
 
-  public dispose(): rsvp.Promise<void> {
-    return new rsvp.Promise<void>((resolve, reject) => {
+  public dispose(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
       rimraf(this.path(), (err) => {
         err ? reject(err) : resolve();
       });
