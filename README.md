@@ -1,86 +1,162 @@
-# broccoli-test-helper
-[![Build status](https://ci.appveyor.com/api/projects/status/x0975l07h1gve9ys/branch/master?svg=true)](https://ci.appveyor.com/project/krisselden/broccoli-test-helper/branch/master)
-[![Build Status](https://travis-ci.org/krisselden/broccoli-test-helper.svg?branch=master)](https://travis-ci.org/krisselden/broccoli-test-helper)
+broccoli-test-helper
+====================
+Test helpers for BroccoliPlugins that make testing build and rebuild behavior dead simple and diff friendly.
 
-Test helpers for BroccoliPlugins that make testing build and rebuild behavior dead simple and expect diff friendly.
+Has TypeScript declarations and supports async/await style testing.
+
+[![Build status](https://ci.appveyor.com/api/projects/status/4oilygqd42yc8wsl/branch/master?svg=true)](https://ci.appveyor.com/project/embercli/broccoli-test-helper/branch/master)
+[![Build Status](https://travis-ci.org/broccolijs/broccoli-test-helper.svg?branch=master)](https://travis-ci.org/broccolijs/broccoli-test-helper)
+
+  * [Usage Examples](#usage-examples)
+    * [QUnit and TypeScript](#qunit-and-typescript)
+    * [Mocha and co](#mocha-and-co)
+
+Usage Examples
+==============
+
+## QUnit and TypeScript
+
+Example works in Node 4+ by using `tsc -t ES2015 -m commonjs` to compile async/await to generator wrapped in a helper.
+
+```ts
+import { createBuilder, createTempDir } from 'broccoli-test-helper';
+import Herp2Derp = require('../index');
+
+QUnit.module('Herp2Derp', () => {
+  QUnit.test('test build', async (assert) => {
+    const input = await createTempDir();
+    try {
+      const subject = new Herp2Derp(input.path());
+      const output = createBuilder(subject);
+      try {
+        // INITIAL
+        input.write({
+          'a.herp': 'A',
+          'lib': {
+            'b.herp': 'B',
+            'c.herp': 'C',
+          },
+        });
+        await output.build();
+
+        assert.deepEqual(output.read() , {
+          'a.derp': 'derp A!',
+          'lib': {
+            'b.derp': 'derp B!',
+            'c.derp': 'derp C!',
+          },
+        });
+        assert.deepEqual(output.changes(), {
+          'a.derp': 'create',
+          'lib/': 'mkdir',
+          'lib/b.derp': 'create',
+          'lib/c.derp': 'create',
+        });
+
+        // UPDATE
+        input.write({
+          'a.herp': 'AA', // change
+          'lib': null,    // rmdir
+        });
+        await output.build();
+
+        assert.deepEqual(output.read(), {
+          'a.derp': 'derp AA!',
+        });
+        assert.deepEqual(output.changes(), {
+          'lib/c.derp': 'unlink',
+          'lib/b.derp': 'unlink',
+          'lib/': 'rmdir',
+          'a.derp': 'change',
+        });
+
+        // NOOP
+        await output.build();
+
+        assert.deepEqual(output.changes(), {});
+      } finally {
+        await output.dispose();
+      }
+    } finally {
+      await input.dispose();
+    }
+  });
+});
+```
+
+## Mocha and co
+
+Example works in Node 4+ by using `co` for async/await like generator syntax.
 
 ```js
 'use strict';
-
-const expect = require('chai').expect;
-const helpers = require('broccoli-test-helper');
-const createBuilder = helpers.createBuilder;
-const createTempDir = helpers.createTempDir;
-const MyBroccoliPlugin = require("../index");
+const helper = require('broccoli-test-helper');
 const co = require('co');
+const expect = require('chai').expect;
+const createBuilder = helper.createBuilder;
+const createTempDir = helper.createTempDir;
+const Herp2Derp = require('../index');
 
-describe("MyBroccoliPlugin", function() {
-  let input;
-  let output;
-  let subject;
+describe('Herp2Derp', function() {
+  it('should build', co.wrap(function* () {
+    const input = yield createTempDir();
+    try {
+      const subject = new Herp2Derp(input.path());
+      const output = createBuilder(subject);
+      try {
+        // INITIAL
+        input.write({
+          'a.herp': 'A',
+          'lib': {
+            'b.herp': 'B',
+            'c.herp': 'C',
+          }
+        });
+        yield output.build();
 
-  beforeEach(co.wrap(function* () {
-    input = yield createTempDir();
-    subject = new MyBroccoliPlugin(input.path());
-    output = createBuilder(subject);
-  }));
+        expect(output.read()).to.deep.equal({
+          'a.derp': 'derp A!',
+          'lib': {
+            'b.derp': 'derp B!',
+            'c.derp': 'derp C!',
+          }
+        });
+        expect(output.changes()).to.deep.equal({
+          'a.derp': 'create',
+          'lib/': 'mkdir',
+          'lib/b.derp': 'create',
+          'lib/c.derp': 'create',
+        });
 
-  afterEach(co.wrap(function* () {
-    yield input.dispose();
-    yield output.dispose();
-  }));
+        // UPDATE
+        input.write({
+          'a.herp': 'AA', // change
+          'lib': null,    // rmdir
+        });
+        yield output.build();
 
-  it("should build", co.wrap(function* () {
-    input.write({
-      "index.js": `export { A } from "./lib/a";`,
-      "lib": {
-        "a.js": `export class A {};`,
-        "b.js": `export class B {};`,
-        "c.js": `export class C {};`
+        expect(output.read()).to.deep.equal({
+          'a.derp': 'derp AA!',
+        });
+        expect(output.changes()).to.deep.equal({
+          'lib/c.derp': 'unlink',
+          'lib/b.derp': 'unlink',
+          'lib/': 'rmdir',
+          'a.derp': 'change',
+        });
+
+        // NOOP
+        yield output.build();
+
+        expect(output.changes()).to.deep.equal({});
       }
-    });
-
-    yield output.build();
-
-    expect(
-      output.read()
-    ).to.deep.equal({
-      "index.js": `exports.A = require("./lib/a").A;`,
-      "lib": {
-        "a.js": `exports.A = class A {};`,
-        "b.js": `exports.B = class B {};`,
-        "c.js": `exports.C = class C {};`
+      finally {
+        yield output.dispose();
       }
-    });
-
-    yield output.build();
-
-    expect(
-      output.changes()
-    ).to.deep.equal({ });
-
-    input.write({
-      "index.js": "export class A {};",
-      "lib": null // delete dir
-    });
-
-    yield output.build();
-
-    expect(
-      output.changes()
-    ).to.deep.equal({
-      "lib/c.js": "unlink",
-      "lib/b.js": "unlink",
-      "lib/a.js": "unlink",
-      "lib/":     "rmdir",
-      "index.js": "change"
-    });
-
-    expect(
-      output.read()
-    ).to.deep.equal({
-      "index.js": `exports.A = class A {};`
-    });
+    }
+    finally {
+      yield input.dispose();
+    }
   }));
 });
 ```
