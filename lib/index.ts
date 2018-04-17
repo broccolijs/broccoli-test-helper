@@ -1,20 +1,19 @@
 import * as t from "./interfaces";
-export { Builder } from "./interfaces";
-import makeTempDir from "./make_temp_dir";
 import Output from "./output";
 import ReadableDir from "./readable_dir";
 import TempDir from "./temp_dir";
+import { makeTempDir } from "./util";
 
 /**
- * Create readable dir.
+ * Wrap a fixture directory in a `ReadableDir` interface.
  * @param dir
  */
-export function createReadableDir(dir: string): t.ReadableDir {
+export function wrapDir(dir: string): t.ReadableDir {
   return new ReadableDir(dir);
 }
 
 /**
- * Create temporary dir.
+ * Create temporary directory for mutation.
  */
 export function createTempDir(): Promise<t.TempDir> {
   return makeTempDir().then((dir) => {
@@ -23,7 +22,7 @@ export function createTempDir(): Promise<t.TempDir> {
 }
 
 /**
- * Create a build output helper with the specified builder.
+ * Wrap the specified Builder in the `Output` interface.
  * @param builder a broccoli builder.
  */
 export function wrapBuilder(builder: t.Builder): t.Output {
@@ -31,8 +30,8 @@ export function wrapBuilder(builder: t.Builder): t.Output {
 }
 
 /**
- * Create a build output helper with the specified output node using
- * the broccoli `Builder`.
+ * Create a broccoli `Builder` with the specified outputNode
+ * and wrap it in the `Output` interface.
  * @param outputNode
  */
 export function createBuilder(outputNode: any): t.Output {
@@ -41,11 +40,17 @@ export function createBuilder(outputNode: any): t.Output {
 }
 
 /**
- * Create a build output helper with the specified output node and a
- * promise for the initial build.
+ * @deprecated use `createBuilder(outputNode)` or `wrapBuilder(builder)` and `await output.build()`
  * @param outputNode
  */
 export function buildOutput(outputNode: any): Promise<t.Output> {
   let output = createBuilder(outputNode);
   return output.build().then(() => output);
+}
+
+/**
+ * @deprecated use `wrapDir(dir)`
+ */
+export function createReadableDir(dir: string): t.ReadableDir {
+  return wrapDir(dir);
 }

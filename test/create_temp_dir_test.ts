@@ -53,6 +53,45 @@ describe("createTempDir", () => {
     );
   });
 
+  it("should support changes", async () => {
+    expect(
+      subject.changes()
+    ).to.deep.equal({});
+
+    subject.write({
+      "hello.txt": "hello",
+      "lib": { "more.txt": "more" }
+    });
+
+    expect(
+      subject.changes()
+    ).to.deep.equal({
+      "hello.txt": "create",
+      "lib/": "mkdir",
+      "lib/more.txt": "create"
+    });
+
+    subject.write({
+      "hello.txt": "goodbye",
+      "lib": null
+    });
+
+    expect(
+      subject.changes()
+    ).to.deep.equal({
+      "lib/more.txt": "unlink",
+      // tslint:disable-next-line object-literal-sort-keys
+      "lib/": "rmdir",
+      "hello.txt": "change"
+    });
+
+    expect(
+      subject.read()
+    ).to.deep.equal({
+      "hello.txt": "goodbye"
+    });
+  });
+
   it("should support reading", () => {
     fs.writeFileSync(subject.path("file.txt"), "hello world");
     fs.mkdirSync(subject.path("lib"));

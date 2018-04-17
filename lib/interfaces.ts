@@ -26,6 +26,12 @@ export interface Disposable {
   dispose(): Promise<void>;
 }
 
+export interface ReadDirOptions {
+  globs?: string[];
+  ignore?: string[];
+  directories?: boolean;
+}
+
 export interface ReadableDir {
   /**
    * Read the content of the directory.
@@ -38,6 +44,15 @@ export interface ReadableDir {
    * @param subpath - subpath within the directory.
    */
   path(subpath?: string): string;
+
+  /** EISDIR ENOENT */
+  readBinary(subpath: string): Buffer | undefined;
+
+  /** EISDIR ENOENT */
+  readText(subpath: string, encoding?: string): string | undefined;
+
+  /** ENOTDIR ENOENT  */
+  readDir(subpath?: string, options?: ReadDirOptions): string[] | undefined;
 }
 
 /**
@@ -82,6 +97,12 @@ export interface Changes {
  * A disposable temporary directory for writing mutable fixture data to.
  */
 export interface TempDir extends ReadableDir, Disposable {
+  /**
+   * Gets the changes since the last time changes() was called or
+   * since the temporary directory was created.
+   */
+  changes(): Changes;
+
   /**
    * Write to the temporary directory.
    *

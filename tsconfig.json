@@ -2,8 +2,8 @@
   "compilerOptions": {
     "module": "commonjs",
     "moduleResolution": "node",
-    "outDir": "dist",
     "target": "es2015",
+    "outDir": "dist",
     "strictNullChecks": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -13,11 +13,9 @@
     "sourceMap": true
   },
   "include": [
+    "index.ts",
     "test/**/*.ts",
     "lib/**/*.ts"
-  ],
-  "files": [
-    "index.ts"
   ],
   "exclude": [
     "node_modules",
