@@ -1,11 +1,17 @@
 {
-    "extends": "tslint:recommended",
-    "rules": {
-        "prefer-for-of": false,
-        "no-var-requires": false,
-        "interface-name": [ false ],
-        "trailing-comma": [
-            false
-        ]
-    }
+  "defaultSeverity": "error",
+  "extends": [
+    "tslint:recommended",
+    "tslint-plugin-prettier",
+    "tslint-config-prettier"
+  ],
+  "jsRules": {},
+  "rules": {
+    "no-floating-promises": true,
+    "no-duplicate-imports": true,
+    "no-import-side-effect": true,
+    "arrow-parens": false,
+    "no-conditional-assignment": false
+  },
+  "rulesDirectory": []
 }

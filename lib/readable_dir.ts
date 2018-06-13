@@ -31,7 +31,10 @@ export default class ReadableDir implements t.ReadableDir {
     return readFile(this.path(subpath), encoding || "utf8");
   }
 
-  public readDir(subpath?: string, options?: t.ReadDirOptions): string[] | undefined {
+  public readDir(
+    subpath?: string,
+    options?: t.ReadDirOptions
+  ): string[] | undefined {
     return readDir(this.path(subpath), options);
   }
 }

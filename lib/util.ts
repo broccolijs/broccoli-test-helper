@@ -31,9 +31,14 @@ export function writeTree(path: string, tree: Tree): void {
 
 export function readFile(path: string, encoding: string): string | undefined;
 export function readFile(path: string): Buffer | undefined;
-export function readFile(path: string, encoding?: string): string | Buffer | undefined {
+export function readFile(
+  path: string,
+  encoding?: string
+): string | Buffer | undefined {
   try {
-    return encoding === undefined ? readFileSync(path) : readFileSync(path, encoding);
+    return encoding === undefined
+      ? readFileSync(path)
+      : readFileSync(path, encoding);
   } catch (e) {
     if (e.code === "EISDIR" || e.code === "ENOENT") {
       return;
@@ -55,7 +60,7 @@ export function readDir(path: string, options?: ReadDirOptions) {
 
 export function removeDir(path: string): Promise<void> {
   return new Promise<void>((resolve, reject) => {
-    rimraf(path, (err) => {
+    rimraf(path, err => {
       err ? reject(err) : resolve();
     });
   });
@@ -64,7 +69,10 @@ export function removeDir(path: string): Promise<void> {
 export function makeTempDir(): Promise<string> {
   return new Promise((resolve, reject) => {
     let template = join(tmpdir(), "XXXXXX");
-    mktemp.createDir(template, (err, path) => err ? reject(err) : resolve(path));
+    mktemp.createDir(
+      template,
+      (err, path) => (err ? reject(err) : resolve(path))
+    );
   });
 }
 
@@ -77,7 +85,7 @@ export function diffEntries(current: FSTree, previous?: FSTree): Changes {
     previous = fsTreeDiff.fromEntries([]);
   }
   let patch = previous.calculatePatch(current);
-  let changes: Changes = this.changes = {};
+  let changes: Changes = (this.changes = {});
   for (let i = 0; i < patch.length; i++) {
     let op = patch[i][0];
     let path = patch[i][1];
@@ -101,7 +109,10 @@ export interface FSTree {
 }
 
 interface Mktemp {
-  createDir(template: string, callback: (err: Error, path: string) => void): string;
+  createDir(
+    template: string,
+    callback: (err: Error, path: string) => void
+  ): string;
 }
 
 interface Fixturify {

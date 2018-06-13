@@ -16,7 +16,7 @@ export function wrapDir(dir: string): t.ReadableDir {
  * Create temporary directory for mutation.
  */
 export function createTempDir(): Promise<t.TempDir> {
-  return makeTempDir().then((dir) => {
+  return makeTempDir().then(dir => {
     return new TempDir(dir);
   });
 }
