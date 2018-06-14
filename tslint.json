@@ -11,7 +11,9 @@
     "no-duplicate-imports": true,
     "no-import-side-effect": true,
     "arrow-parens": false,
-    "no-conditional-assignment": false
+    "no-conditional-assignment": false,
+    "interface-name": false,
+    "prefer-for-of": false
   },
   "rulesDirectory": []
 }

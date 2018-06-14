@@ -44,7 +44,7 @@ export function createBuilder(outputNode: any): t.Output {
  * @param outputNode
  */
 export function buildOutput(outputNode: any): Promise<t.Output> {
-  let output = createBuilder(outputNode);
+  const output = createBuilder(outputNode);
   return output.build().then(() => output);
 }
 

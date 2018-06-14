@@ -12,7 +12,7 @@ export default class TempDir extends ReadableDir implements t.TempDir {
   }
 
   public changes(): t.Changes {
-    let treeDiff = this.treeDiff;
+    const treeDiff = this.treeDiff;
     treeDiff.recompute();
     return treeDiff.changes;
   }

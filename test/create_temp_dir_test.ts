@@ -1,6 +1,6 @@
+import { createTempDir, TempDir } from "broccoli-test-helper";
 import { expect } from "chai";
 import * as fs from "fs";
-import { createTempDir, TempDir } from "../index";
 
 describe("createTempDir", () => {
   let subject: TempDir;

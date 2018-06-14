@@ -1,5 +1,7 @@
+import { createBuilder, Output, Tree } from "broccoli-test-helper";
 import { expect } from "chai";
-import { createBuilder, Output, Tree } from "../index";
+
+// tslint:disable-next-line:no-var-requires
 const Fixturify: any = require("broccoli-fixturify");
 
 describe("buildOutput", () => {
@@ -13,7 +15,7 @@ describe("buildOutput", () => {
         "more.txt": "even more",
       },
     };
-    let outputNode = new Fixturify(fixture);
+    const outputNode = new Fixturify(fixture);
     subject = createBuilder(outputNode);
   });
 

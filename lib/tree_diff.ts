@@ -1,5 +1,6 @@
+import { FSTree } from "fs-tree-diff";
 import { Changes } from "./interfaces";
-import { diffEntries, FSTree, readEntries } from "./util";
+import { diffEntries, readEntries } from "./util";
 
 export default class TreeDiff {
   public changes: Changes = {};
@@ -7,8 +8,8 @@ export default class TreeDiff {
   constructor(private path: string) {}
 
   public recompute(): void {
-    let previous = this.previous;
-    let current = readEntries(this.path);
+    const previous = this.previous;
+    const current = readEntries(this.path);
     this.changes = diffEntries(current, previous);
     this.previous = current;
   }

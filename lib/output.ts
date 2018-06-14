@@ -24,11 +24,9 @@ export default class Output extends ReadableDir implements t.Output {
     return Promise.resolve(this.builder.cleanup());
   }
 
-  /**
-   * @deprecated
-   */
   public rebuild(): Promise<t.Output> {
-    console.warn(`rebuilt() is deprecated, just call build() any.`);
+    // tslint:disable-next-line:no-console
+    console.warn(`rebuild() is deprecated, use build() instead.`);
     return this.build().then(() => this);
   }
 }

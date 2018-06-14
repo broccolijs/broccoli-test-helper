@@ -12,11 +12,11 @@ export default class ReadableDir implements t.ReadableDir {
   }
 
   public path(subpath?: string): string {
-    let dir = this.dir;
+    const dir = this.dir;
     if (subpath === undefined) {
       return dir;
     }
-    let path = joinPath(dir, subpath);
+    const path = joinPath(dir, subpath);
     if (!path.startsWith(dir)) {
       throw new Error("subpath should not escape directory");
     }

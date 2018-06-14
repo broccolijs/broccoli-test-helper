@@ -3,7 +3,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "es2015",
-    "outDir": "dist",
+    "outDir": "../dist/test",
     "strictNullChecks": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -12,5 +12,5 @@
     "declaration": true,
     "sourceMap": true
   },
-  "files": ["lib/external.d.ts", "index.ts"]
+  "include": ["*_test.ts"]
 }

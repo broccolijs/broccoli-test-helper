@@ -40,12 +40,15 @@ export interface ReadableDir {
   read(from?: string): Tree;
 
   /**
-   * Returns the absolute path to the directory.
+   * Returns the absolute path to the directory or the absolute path to the subpath if specified.
    * @param subpath - subpath within the directory.
    */
   path(subpath?: string): string;
 
-  /** EISDIR ENOENT */
+  /**
+   * EISDIR ENOENT
+   * @param subpath - subpath within the directory.
+   */
   readBinary(subpath: string): Buffer | undefined;
 
   /** EISDIR ENOENT */
