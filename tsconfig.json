@@ -3,6 +3,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "es2015",
+    "rootDir": "src",
     "outDir": "dist",
     "strictNullChecks": true,
     "noImplicitAny": true,
@@ -10,7 +11,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "declaration": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "types": ["node", "rimraf"]
   },
-  "files": ["lib/external.d.ts", "index.ts"]
+  "files": ["src/external.d.ts", "src/index.ts"]
 }

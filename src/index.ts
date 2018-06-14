@@ -4,6 +4,8 @@ import ReadableDir from "./readable_dir";
 import TempDir from "./temp_dir";
 import { makeTempDir } from "./util";
 
+export * from "./interfaces";
+
 /**
  * Wrap a fixture directory in a `ReadableDir` interface.
  * @param dir

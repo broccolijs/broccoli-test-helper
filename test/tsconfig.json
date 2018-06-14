@@ -10,7 +10,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "declaration": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "types": ["node", "mocha", "chai"]
   },
   "include": ["*_test.ts"]
 }
