@@ -3,14 +3,18 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "es2015",
-    "outDir": "../dist/test",
-    "strictNullChecks": true,
-    "noImplicitAny": true,
+    "outDir": "../dist/tests",
+    "strict": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "declaration": true,
     "sourceMap": true,
+    "lib": [
+      "es5",
+      "es2015.core",
+      "es2015.promise"
+    ],
     "types": ["node", "mocha", "chai"]
   },
   "include": ["*_test.ts"]

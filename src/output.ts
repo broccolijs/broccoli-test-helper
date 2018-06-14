@@ -3,7 +3,7 @@ import ReadableDir from "./readable_dir";
 import TreeDiff from "./tree_diff";
 
 export default class Output extends ReadableDir implements t.Output {
-  private treeDiff: TreeDiff;
+  protected treeDiff: TreeDiff;
 
   constructor(public builder: t.Builder) {
     super(builder.outputPath);
@@ -16,7 +16,7 @@ export default class Output extends ReadableDir implements t.Output {
 
   public build(): Promise<void> {
     return this.builder.build().then(() => {
-      this.treeDiff.recompute();
+      this.treeDiff.diff();
     });
   }
 

@@ -1,12 +1,12 @@
 import { readSync, writeSync } from "fixturify";
-import { readFileSync } from "fs";
-import { fromEntries, FSTree } from "fs-tree-diff";
+import { readFileSync, writeFileSync } from "fs";
+import { fromEntries } from "fs-tree-diff";
 import * as mktemp from "mktemp";
 import { tmpdir } from "os";
 import * as pathmod from "path";
 import * as rimraf from "rimraf";
 import * as walkSync from "walk-sync";
-import { Changes, ReadDirOptions, Tree } from "./interfaces";
+import { ChangeOp, Changes, ReadDirOptions, Tree } from "./interfaces";
 
 function normalizeSlashes(path: string): string {
   return path.replace(/\\/g, "/");
@@ -26,6 +26,22 @@ export function readTree(path: string): Tree {
 
 export function writeTree(path: string, tree: Tree): void {
   writeSync(path, tree);
+}
+
+export function writeFile(path: string, data: string, encoding: string): void;
+export function writeFile(path: string, data: Buffer): void;
+export function writeFile(
+  path: string,
+  data: Buffer | string,
+  encoding?: string
+): void {
+  // ensure path exists
+  writeSync(pathmod.dirname(path), {});
+  if (encoding === undefined) {
+    writeFileSync(path, data);
+  } else {
+    writeFileSync(path, data, encoding);
+  }
 }
 
 export function readFile(path: string, encoding: string): string | undefined;
@@ -48,7 +64,11 @@ export function readFile(
 
 export function readDir(path: string, options?: ReadDirOptions) {
   try {
-    return walkSync(path, options);
+    return walkSync(path, {
+      directories: options && options.directories,
+      globs: options && options.include,
+      ignore: options && options.exclude,
+    });
   } catch (e) {
     if (e.code === "ENOTDIR" || e.code === "ENOENT") {
       return;
@@ -79,12 +99,9 @@ export function readEntries(path: string): FSTree {
   return fromEntries(walkSync.entries(path));
 }
 
-export function diffEntries(current: FSTree, previous?: FSTree): Changes {
-  if (previous === undefined) {
-    previous = fromEntries([]);
-  }
+export function diffEntries(current: FSTree, previous: FSTree): Changes {
   const patch = previous.calculatePatch(current);
-  const changes: Changes = (this.changes = {});
+  const changes: Changes = {};
   for (let i = 0; i < patch.length; i++) {
     const op = patch[i][0];
     const path = patch[i][1];
@@ -92,3 +109,19 @@ export function diffEntries(current: FSTree, previous?: FSTree): Changes {
   }
   return changes;
 }
+
+export interface Entry {
+  relativePath: string;
+  basePath: string;
+  fullPath: string;
+  mode: number;
+  size: number;
+  mtime: Date;
+  isDirectory(): boolean;
+}
+
+export interface FSTree {
+  calculatePatch(next: FSTree): PatchTuple[];
+}
+
+export type PatchTuple = [ChangeOp, string, Entry];

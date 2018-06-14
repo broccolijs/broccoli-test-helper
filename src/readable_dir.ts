@@ -1,8 +1,11 @@
 import * as t from "./interfaces";
+import TreeDiff from "./tree_diff";
 import { joinPath, readDir, readFile, readTree, resolvePath } from "./util";
 
 export default class ReadableDir implements t.ReadableDir {
+  protected treeDiff?: TreeDiff;
   private dir: string;
+
   constructor(dir: string) {
     this.dir = resolvePath(dir);
   }
@@ -31,10 +34,30 @@ export default class ReadableDir implements t.ReadableDir {
     return readFile(this.path(subpath), encoding || "utf8");
   }
 
+  public readDir(options?: t.ReadDirOptions): string[];
+
   public readDir(
-    subpath?: string,
+    subpath: string,
+    options?: t.ReadDirOptions
+  ): string[] | undefined;
+
+  public readDir(
+    subpathOrOptions?: string | t.ReadDirOptions,
     options?: t.ReadDirOptions
   ): string[] | undefined {
-    return readDir(this.path(subpath), options);
+    if (typeof subpathOrOptions === "string") {
+      return readDir(this.path(subpathOrOptions), options);
+    } else {
+      return readDir(this.path(), subpathOrOptions);
+    }
+  }
+
+  public changes(): t.Changes {
+    if (this.treeDiff === undefined) {
+      this.treeDiff = new TreeDiff(this.dir);
+    } else {
+      this.treeDiff.diff();
+    }
+    return this.treeDiff.changes;
   }
 }

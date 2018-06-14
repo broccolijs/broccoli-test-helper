@@ -5,14 +5,22 @@
     "target": "es2015",
     "rootDir": "src",
     "outDir": "dist",
-    "strictNullChecks": true,
-    "noImplicitAny": true,
+    "strict": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "declaration": true,
     "sourceMap": true,
+    "lib": [
+      "es5",
+      "es2015.core",
+      "es2015.promise"
+    ],
+    "baseUrl": "src",
+    "paths": {
+      "*": ["*.d.ts"]
+    },
     "types": ["node", "rimraf"]
   },
-  "files": ["src/external.d.ts", "src/index.ts"]
+  "files": ["src/index.ts"]
 }

@@ -10,6 +10,7 @@ Has TypeScript declarations and supports async/await style testing.
 - [Usage Examples](#usage-examples)
   - [QUnit and TypeScript](#qunit-and-typescript)
   - [Mocha and co](#mocha-and-co)
+- [API](docs/api/index.md)
 
 # Usage Examples
 
