@@ -2,9 +2,9 @@
 
 - [broccoli-test-helper](../../README.md#broccoli-test-helper)
   - [Functions](#functions)
-    - [wrapDir(dir)](#wrapdirdir)
+    - [fromDir(dir)](#fromdirdir)
     - [createTempDir()](#createtempdir)
-    - [wrapBuilder(builder)](#wrapbuilderbuilder)
+    - [fromBuilder(builder)](#frombuilderbuilder)
     - [createBuilder(outputNode)](#createbuilderoutputnode)
   - [Interfaces](#interfaces)
     - [Output](#output)
@@ -41,35 +41,52 @@
 
 ## Functions
 
-### wrapDir(dir)
+### fromDir(dir)
 
-Wrap a fixture directory in a [ReadableDir](#readabledir) interface or
-a directory you want to track changes to but is not in a the build
-[Output](#output) or a [TempDir](#tempdir).
+Returns a [ReadableDir](#readabledir) from the specified directory.
 
 ```typescript
-function wrapDir(dir: string): ReadableDir;
+function fromDir(dir: string): ReadableDir;
 ```
 
-Example wrap fixtures:
+**Example**
+
+A directory of fixtures.
 
 ```typescript
-const fixtures = wrapDir("tests/fixtures");
-const tmpDir = createTempDir();
+const fixtures = fromDir("tests/fixtures");
+const tmpDir = await createTempDir();
 tmpDir.write(fixtures.read("test-case-a"));
 ```
 
-Example track changes outside of build outputPath:
+This pattern makes it so you don't accidentally mutate source fixtures.
+
+You could also use [TempDir.copy(from, to)](#tempdircopyfrom-to) but this
+allows more flexibility like iteration of test cases:
 
 ```typescript
-const dist = wrapDir("dist");
+fixtures.readDir({ include: ["test-case-*"] }).forEach(testCaseDir =>
+  generateTestCase(extractNameFrom(testCaseDir), {
+    setup(input) {
+      input.write(fixtures.read(testCaseDir));
+    },
+  })
+);
+```
+
+**Example**
+
+Track changes outside of build outputPath
+
+```typescript
+const dist = fromDir("dist");
 // start tracking changes
 dist.changes();
 // do something
-assert.deepEqual(dist.changes, expected);
+await output.build();
+// assert changes
+assert.deepEqual(dist.changes, expectedChanges);
 ```
-
-This pattern makes it so you don't accidentally mutate source fixtures.
 
 **Parameters**
 
@@ -97,16 +114,16 @@ Promise<[TempDir](#tempdir)>
 
 ---
 
-### wrapBuilder(builder)
+### fromBuilder(builder)
 
-Wrap the specified [Builder](#builder) in the [Output](#output) interface.
+Returns an [Output](#output) from a [Builder](#builder).
+
+```typescript
+function fromBuilder(builder: Builder): Output;
+```
 
 The [Output](#output) is a [ReadableDir](#readabledir) that supports building
 with change tracking between builds.
-
-```typescript
-function wrapBuilder(builder: Builder): Output;
-```
 
 **Parameters**
 
@@ -123,7 +140,7 @@ function wrapBuilder(builder: Builder): Output;
 ### createBuilder(outputNode)
 
 Create a broccoli [Builder](#builder) with the specified outputNode
-and wrap it in the [Output](#output) interface.
+returning an [Output](#output) interface for testing.
 
 ```typescript
 function createBuilder(outputNode: any): Output;
@@ -462,7 +479,6 @@ Gets the changes since the last time changes() was called or
 starts tracking changes and returns empty.
 
 Useful for tracking changes to a directory that is not part of the build [Output](#output)
-and that you don't modify as part of the test or [wrapDir(dir)](#wrapdirdir)
 
 ```typescript
 changes(): Changes;
@@ -566,7 +582,7 @@ interface ReadDirOptions {
 
 ### Builder
 
-Interface expected by [wrapBuilder(builder)](#wrapbuilderbuilder).
+Interface expected by [fromBuilder(builder)](#frombuilderbuilder).
 
 ```typescript
 interface Builder {
