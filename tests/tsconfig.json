@@ -3,8 +3,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "target": "es2015",
-    "rootDir": "src",
-    "outDir": "dist",
+    "outDir": "../dist/tests",
     "strict": true,
     "noImplicitReturns": true,
     "noUnusedLocals": true,
@@ -16,11 +15,7 @@
       "es2015.core",
       "es2015.promise"
     ],
-    "baseUrl": "src",
-    "paths": {
-      "*": ["*.d.ts"]
-    },
-    "types": ["node", "rimraf"]
+    "types": ["node", "mocha", "chai"]
   },
-  "files": ["src/index.ts"]
+  "include": ["*_test.ts"]
 }

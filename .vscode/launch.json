@@ -9,15 +9,12 @@
       "request": "launch",
       "name": "Launch Program",
       "program": "${workspaceRoot}/node_modules/.bin/_mocha",
-      "args": [
-        "--no-timeouts",
-        "${workspaceRoot}/dist/test"
-      ],
+      "args": ["--no-timeouts", "${workspaceRoot}/dist/tests"],
       "preLaunchTask": "build",
       "outFiles": [
         "${workspaceRoot}/dist/index.js",
         "${workspaceRoot}/dist/lib/**/*.js",
-        "${workspaceRoot}/dist/test/**/*.js"
+        "${workspaceRoot}/dist/tests/**/*.js"
       ],
       "sourceMaps": true
     }
