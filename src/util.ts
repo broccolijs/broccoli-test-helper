@@ -1,4 +1,4 @@
-import { readSync, writeSync } from "fixturify";
+import { writeSync } from "fixturify";
 import { readFileSync, writeFileSync } from "fs";
 import { fromEntries } from "fs-tree-diff";
 import * as mktemp from "mktemp";
@@ -6,7 +6,13 @@ import { tmpdir } from "os";
 import * as pathmod from "path";
 import * as rimraf from "rimraf";
 import * as walkSync from "walk-sync";
-import { ChangeOp, Changes, ReadDirOptions, Tree } from "./interfaces";
+import {
+  ChangeOp,
+  Changes,
+  ReadDirOptions,
+  ReadOptions,
+  Tree,
+} from "./interfaces";
 
 function normalizeSlashes(path: string): string {
   return path.replace(/\\/g, "/");
@@ -20,8 +26,37 @@ export function joinPath(path: string, subpath: string): string {
   return normalizeSlashes(pathmod.join(path, subpath));
 }
 
-export function readTree(path: string): Tree {
-  return readSync(path);
+export function readTree(path: string, options?: ReadOptions): Tree {
+  const tree: Tree = {};
+  const subpaths = walkSync(path, {
+    globs: options && options.include,
+    ignore: options && options.exclude,
+  });
+  subpaths.forEach(subpath => {
+    addToTree(path, tree, subpath);
+  });
+  return tree;
+}
+
+function addToTree(path: string, tree: Tree, subpath: string) {
+  let parent = tree;
+  const parts = subpath.split("/");
+  let i;
+  for (i = 0; i < parts.length - 1; i++) {
+    parent = getOrCreateChildDir(parent, parts[i]);
+  }
+  const last = parts[i];
+  if (last !== "") {
+    parent[last] = readFileSync(pathmod.join(path, subpath), "utf8");
+  }
+}
+
+function getOrCreateChildDir(parent: Tree, entry: string) {
+  let child = parent[entry];
+  if (child === undefined) {
+    child = parent[entry] = {};
+  }
+  return child as Tree;
 }
 
 export function writeTree(path: string, tree: Tree): void {

@@ -18,7 +18,8 @@
       - [TempDir.writeText(subpath, encoding)](#tempdirwritetextsubpath-encoding)
       - [TempDir.makeDir(subpath)](#tempdirmakedirsubpath)
     - [ReadableDir](#readabledir)
-      - [ReadableDir.read(from)](#readabledirreadfrom)
+      - [ReadableDir.read(options)](#readabledirreadoptions)
+      - [ReadableDir.read(subpath, options)](#readabledirreadsubpath-options)
       - [ReadableDir.path(subpath)](#readabledirpathsubpath)
       - [ReadableDir.readBinary(subpath)](#readabledirreadbinarysubpath)
       - [ReadableDir.readText(subpath, encoding)](#readabledirreadtextsubpath-encoding)
@@ -32,6 +33,7 @@
     - [Tree](#tree)
       - [Tree[name]](#treename)
     - [ReadDirOptions](#readdiroptions)
+    - [ReadOptions](#readoptions)
     - [Builder](#builder)
       - [Builder.build()](#builderbuild)
       - [Builder.cleanup()](#buildercleanup)
@@ -154,7 +156,7 @@ function createBuilder(outputNode: any): Output;
 
 **Return type**
 
-[Output][interfacedeclaration-6]
+[Output](#output)
 
 ## Interfaces
 
@@ -204,9 +206,9 @@ Promise<void>
 
 **Properties**
 
-| Name    | Type                | Optional | Description                                          |
-| ------- | ------------------- | -------- | ---------------------------------------------------- |
-| builder | [Builder](#builder) | false    | The builder associated with this output test helper. |
+| Name    | Type                | Description                                          |
+| ------- | ------------------- | ---------------------------------------------------- |
+| builder | [Builder](#builder) | The builder associated with this output test helper. |
 
 ---
 
@@ -350,36 +352,53 @@ Common methods for directory test helpers.
 
 ```typescript
 interface ReadableDir {
-  read(from?: string | undefined): Tree;
-  path(subpath?: string | undefined): string;
+  read(options?: ReadOptions): Tree;
+  read(from: string, options?: ReadOptions): Tree;
+  path(subpath?: string): string;
   readBinary(subpath: string): Buffer | undefined;
   readText(subpath: string, encoding?: string | undefined): string | undefined;
-  readDir(options?: ReadDirOptions | undefined): string[];
-  readDir(
-    subpath?: string | undefined,
-    options?: ReadDirOptions | undefined
-  ): string[] | undefined;
+  readDir(options?: ReadDirOptions): string[];
+  readDir(subpath: string, options?: ReadDirOptions): string[] | undefined;
   changes(): Changes;
 }
 ```
 
-#### ReadableDir.read(from)
+#### ReadableDir.read(options)
 
 Read the content of the directory.
 
 ```typescript
-read(from?: string | undefined): Tree;
+read(options?: ReadOptions): Tree;
 ```
 
 **Parameters**
 
-| Name | Type                    | Description                                        |
-| ---- | ----------------------- | -------------------------------------------------- |
-| from | string &#124; undefined | a relative path to read from within the directory. |
+| Name    | Type                        | Optional | Description                       |
+| ------- | --------------------------- | -------- | --------------------------------- |
+| options | [ReadOptions](#readoptions) | true     | optional options to support globs |
 
 **Return type**
 
-[Tree][interfacedeclaration-1]
+[Tree](#tree)
+
+#### ReadableDir.read(subpath, options)
+
+Read the content of the directory at a subpath.
+
+```typescript
+read(from: string, options?: ReadOptions): Tree;
+```
+
+**Parameters**
+
+| Name    | Type                        | Optional | Description                                        |
+| ------- | --------------------------- | -------- | -------------------------------------------------- |
+| subpath | string                      | false    | a relative path to read from within the directory. |
+| options | [ReadOptions](#readoptions) | true     | optional options to support globs                  |
+
+**Return type**
+
+[Tree](#tree)
 
 #### ReadableDir.path(subpath)
 
@@ -441,14 +460,14 @@ string | undefined
 Reads the directory entries recursively using the specified options.
 
 ```typescript
-readDir(options?: ReadDirOptions | undefined): string[] | undefined;
+readDir(options?: ReadDirOptions): string[] | undefined;
 ```
 
 **Parameters**
 
-| Name    | Type                            |
-| ------- | ------------------------------- |
-| options | ReadDirOptions &#124; undefined |
+| Name    | Type                              | Optional |
+| ------- | --------------------------------- | -------- |
+| options | [ReadDirOptions](#readdiroptions) | true     |
 
 **Return type**
 
@@ -459,15 +478,15 @@ string[] | undefined
 Reads the directory entries recursively at the specified subpath using the specified options.
 
 ```typescript
-readDir(subpath: string, options?: ReadDirOptions | undefined): string[] | undefined;
+readDir(subpath: string, options?: ReadDirOptions): string[] | undefined;
 ```
 
 **Parameters**
 
-| Name    | Type                                               |
-| ------- | -------------------------------------------------- |
-| subpath | string                                             |
-| options | [ReadDirOptions](#readdiroptions) &#124; undefined |
+| Name    | Type                              | Optional |
+| ------- | --------------------------------- | -------- |
+| subpath | string                            | false    |
+| options | [ReadDirOptions](#readdiroptions) | true     |
 
 **Return type**
 
@@ -560,23 +579,43 @@ interface Tree {
 
 ### ReadDirOptions
 
-Options for Tree.readDir
+Options for [ReadableDir.readDir](#readabledirreaddiroptions)
 
 ```typescript
 interface ReadDirOptions {
   include?: string[];
   exclude?: string[];
-  directories?: boolean | undefined;
+  directories?: boolean;
 }
 ```
 
 **Properties**
 
-| Name        | Type                     | Optional | Description                                               |
-| ----------- | ------------------------ | -------- | --------------------------------------------------------- |
-| include     | string[]                 | true     | Array of globs to include                                 |
-| exclude     | string[]                 | true     | Array of globs to exclude                                 |
-| directories | boolean &#124; undefined | true     | Whether directories should be included in readDir result. |
+| Name        | Type     | Optional | Description                                               |
+| ----------- | -------- | -------- | --------------------------------------------------------- |
+| include     | string[] | true     | Array of globs to include                                 |
+| exclude     | string[] | true     | Array of globs to exclude                                 |
+| directories | boolean  | true     | Whether directories should be included in readDir result. |
+
+---
+
+### ReadOptions
+
+Options for [ReadableDir.read](#readabledirreadoptions)
+
+```typescript
+interface ReadOptions {
+  include?: string[];
+  exclude?: string[];
+}
+```
+
+**Properties**
+
+| Name    | Type     | Optional | Description               |
+| ------- | -------- | -------- | ------------------------- |
+| include | string[] | true     | Array of globs to include |
+| exclude | string[] | true     | Array of globs to exclude |
 
 ---
 

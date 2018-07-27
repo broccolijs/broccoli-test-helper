@@ -127,10 +127,24 @@ export interface Builder {
 export interface ReadableDir {
   /**
    * Read the content of the directory.
-   * @param from  a relative path to read from within the directory.
+   * @param options
    * @public
    */
-  read(from?: string): Tree;
+  read(options?: ReadOptions): Tree;
+
+  /**
+   * Read the content of the directory.
+   * @param from  a relative path to read from within the directory.
+   * @param options
+   * @public
+   */
+  read(
+    from?: string,
+    options?: {
+      include?: string[];
+      exclude?: string[];
+    }
+  ): Tree;
 
   /**
    * Resolves and normalizes the path to the directory or the subpath if specified.
@@ -228,6 +242,20 @@ export interface Disposable {
    * @public
    */
   dispose(): Promise<void>;
+}
+
+/**
+ * Options for `ReadableDir.read`
+ */
+export interface ReadOptions {
+  /**
+   * Array of globs to include
+   */
+  include?: string[];
+  /**
+   * Array of globs to exclude
+   */
+  exclude?: string[];
 }
 
 /**

@@ -10,8 +10,14 @@ export default class ReadableDir implements t.ReadableDir {
     this.dir = resolvePath(dir);
   }
 
-  public read(from?: string): t.Tree {
-    return readTree(this.path(from));
+  public read(
+    fromOrOptions?: string | t.ReadOptions,
+    options?: t.ReadOptions
+  ): t.Tree {
+    if (typeof fromOrOptions === "string") {
+      return readTree(this.path(fromOrOptions), options);
+    }
+    return readTree(this.path(), fromOrOptions);
   }
 
   public path(subpath?: string): string {

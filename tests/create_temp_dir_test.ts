@@ -171,13 +171,69 @@ describe("createTempDir", () => {
     expect(
       subject.readDir({
         directories: false,
-        exclude: ["dist/tests/**"],
+        exclude: ["dist/tests"],
         include: ["dist/**"],
       })
     ).to.deep.equal(["dist/index.js"]);
 
     expect(subject.readDir("dist/index.js")).to.be.equal(undefined);
     expect(subject.readDir("missing")).to.be.equal(undefined);
+  });
+
+  it("should support globs in reading", () => {
+    subject.write({
+      dist: {
+        "index.js": "",
+        tests: {
+          "test.js": "",
+        },
+      },
+      "package.json": "",
+      src: {
+        "index.ts": "",
+      },
+      styles: { "app.css": "" },
+      tests: {
+        "test.ts": "",
+      },
+    });
+
+    expect(
+      subject.read({
+        exclude: ["dist/tests"],
+        include: ["src/**", "dist/**"],
+      })
+    ).to.deep.equal({
+      dist: {
+        "index.js": "",
+      },
+      src: {
+        "index.ts": "",
+      },
+    });
+
+    expect(
+      subject.read({
+        include: ["**/*.js"],
+      })
+    ).to.deep.equal({
+      dist: {
+        "index.js": "",
+        tests: {
+          "test.js": "",
+        },
+      },
+    });
+
+    expect(
+      subject.read("dist", {
+        include: ["**/test.js"],
+      })
+    ).to.deep.equal({
+      tests: {
+        "test.js": "",
+      },
+    });
   });
 
   it("should support changes", async () => {
