@@ -11,16 +11,12 @@
     "noUnusedParameters": true,
     "declaration": true,
     "sourceMap": true,
-    "lib": [
-      "es5",
-      "es2015.core",
-      "es2015.promise"
-    ],
+    "lib": ["es5", "es2015.core", "es2015.promise"],
     "baseUrl": "src",
     "paths": {
       "*": ["*.d.ts"]
     },
-    "types": ["node", "rimraf"]
+    "types": ["node", "tmp"]
   },
   "files": ["src/index.ts"]
 }

@@ -2,7 +2,6 @@ import * as t from "./interfaces";
 import Output from "./output";
 import ReadableDir from "./readable_dir";
 import TempDir from "./temp_dir";
-import { makeTempDir } from "./util";
 
 export * from "./interfaces";
 
@@ -20,8 +19,8 @@ export function fromDir(dir: string): t.ReadableDir {
  * @public
  */
 export function createTempDir(): Promise<t.TempDir> {
-  return makeTempDir().then(dir => {
-    return new TempDir(dir);
+  return new Promise(resolve => {
+    resolve(new TempDir());
   });
 }
 

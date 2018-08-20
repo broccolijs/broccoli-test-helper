@@ -1,10 +1,7 @@
 import { writeSync } from "fixturify";
 import { readFileSync, writeFileSync } from "fs";
 import { fromEntries } from "fs-tree-diff";
-import * as mktemp from "mktemp";
-import { tmpdir } from "os";
 import * as pathmod from "path";
-import * as rimraf from "rimraf";
 import * as walkSync from "walk-sync";
 import {
   ChangeOp,
@@ -110,24 +107,6 @@ export function readDir(path: string, options?: ReadDirOptions) {
     }
     throw e;
   }
-}
-
-export function removeDir(path: string): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    rimraf(path, err => {
-      err ? reject(err) : resolve();
-    });
-  });
-}
-
-export function makeTempDir(): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const template = pathmod.join(tmpdir(), "XXXXXX");
-    mktemp.createDir(
-      template,
-      (err, path) => (err ? reject(err) : resolve(path))
-    );
-  });
 }
 
 export function readEntries(path: string): FSTree {
