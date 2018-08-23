@@ -1,10 +1,27 @@
+import * as tmp from "tmp";
 import * as t from "./interfaces";
 import ReadableDir from "./readable_dir";
-import { readTree, removeDir, writeFile, writeTree } from "./util";
+import { readTree, writeFile, writeTree } from "./util";
+
+tmp.setGracefulCleanup();
 
 export default class TempDir extends ReadableDir implements t.TempDir {
-  constructor(dir: string) {
-    super(dir);
+  public dispose: () => Promise<void>;
+
+  constructor() {
+    let tmpDir: tmp.SynchrounousResult | undefined = tmp.dirSync({
+      unsafeCleanup: true,
+    });
+    super(tmpDir.name);
+    this.dispose = () => {
+      return new Promise(resolve => {
+        if (tmpDir !== undefined) {
+          tmpDir.removeCallback();
+          tmpDir = undefined;
+        }
+        resolve();
+      });
+    };
     // start change tracking
     this.changes();
   }
@@ -27,9 +44,5 @@ export default class TempDir extends ReadableDir implements t.TempDir {
 
   public copy(from: string, to?: string): void {
     writeTree(this.path(to), readTree(from));
-  }
-
-  public dispose(): Promise<void> {
-    return removeDir(this.path());
   }
 }
