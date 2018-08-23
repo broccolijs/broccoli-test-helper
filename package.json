@@ -1,6 +1,6 @@
 {
   "name": "broccoli-test-helper",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Test helpers for BroccoliPlugins that make testing build and rebuild behavior dead simple and expect diff friendly.",
   "homepage": "https://github.com/broccolijs/broccoli-test-helper",
   "bugs": {
