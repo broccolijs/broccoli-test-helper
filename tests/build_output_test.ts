@@ -1,76 +1,86 @@
-import { createBuilder, Output, Tree } from "broccoli-test-helper";
+import { BuilderConstructor, fromBuilder, Output, Tree } from "broccoli-test-helper";
 import { expect } from "chai";
 
-// tslint:disable-next-line:no-var-requires
+// tslint:disable:no-var-requires
 const Fixturify: any = require("broccoli-fixturify");
+const multidep: any = require('multidep');
+// tslint:enable:no-var-requires
+
+const multidepRequire = multidep('tests/multidep.json');
 
 describe("buildOutput", () => {
   let fixture: Tree;
   let subject: Output;
 
-  beforeEach(async () => {
-    fixture = {
-      "hello.txt": "hello world",
-      lib: {
-        "more.txt": "even more",
-      },
-    };
-    const outputNode = new Fixturify(fixture);
-    subject = createBuilder(outputNode);
-  });
+  multidepRequire.forEachVersion('broccoli', (version: string, broccoli: { Builder: BuilderConstructor }) => {
+    describe(version, () => {
 
-  afterEach(() => subject.dispose());
+      beforeEach(async () => {
+        fixture = {
+          "hello.txt": "hello world",
+          lib: {
+            "more.txt": "even more",
+          },
+        };
+        const outputNode = new Fixturify(fixture);
+        const Builder = broccoli.Builder;
+        subject = fromBuilder(new Builder(outputNode));
+      });
 
-  it("should support read", async () => {
-    expect(subject.read()).to.deep.equal({});
+      afterEach(() => subject.dispose());
 
-    await subject.build();
+      it("should support read", async () => {
+        expect(subject.read()).to.deep.equal({});
 
-    expect(subject.read()).to.deep.equal({
-      "hello.txt": "hello world",
-      lib: {
-        "more.txt": "even more",
-      },
+        await subject.build();
+
+        expect(subject.read()).to.deep.equal({
+          "hello.txt": "hello world",
+          lib: {
+            "more.txt": "even more",
+          },
+        });
+
+        expect(subject.read("lib")).to.deep.equal({
+          "more.txt": "even more",
+        });
+      });
+
+      it("should support changes on build and rebuild", async () => {
+        expect(subject.changes()).to.deep.equal({});
+
+        await subject.build();
+
+        expect(subject.changes()).to.deep.equal({
+          "hello.txt": "create",
+          "lib/": "mkdir",
+          "lib/more.txt": "create",
+        });
+
+        fixture["hello.txt"] = "goodbye";
+        // tslint:disable-next-line no-string-literal
+        fixture["lib"] = null;
+
+        await subject.build();
+
+        expect(subject.changes()).to.deep.equal({
+          "lib/more.txt": "unlink",
+          // tslint:disable-next-line object-literal-sort-keys
+          "lib/": "rmdir",
+          "hello.txt": "change",
+        });
+
+        expect(subject.read()).to.deep.equal({
+          "hello.txt": "goodbye",
+        });
+      });
+
+      it("support cleanup builder on dispose", async () => {
+        await subject.dispose();
+
+        // output path is gone
+        expect(() => subject.read()).to.throw(/ENOENT/);
+      });
     });
-
-    expect(subject.read("lib")).to.deep.equal({
-      "more.txt": "even more",
-    });
-  });
-
-  it("should support changes on build and rebuild", async () => {
-    expect(subject.changes()).to.deep.equal({});
-
-    await subject.build();
-
-    expect(subject.changes()).to.deep.equal({
-      "hello.txt": "create",
-      "lib/": "mkdir",
-      "lib/more.txt": "create",
-    });
-
-    fixture["hello.txt"] = "goodbye";
-    // tslint:disable-next-line no-string-literal
-    fixture["lib"] = null;
-
-    await subject.build();
-
-    expect(subject.changes()).to.deep.equal({
-      "lib/more.txt": "unlink",
-      // tslint:disable-next-line object-literal-sort-keys
-      "lib/": "rmdir",
-      "hello.txt": "change",
-    });
-
-    expect(subject.read()).to.deep.equal({
-      "hello.txt": "goodbye",
-    });
-  });
-
-  it("support cleanup builder on dispose", async () => {
-    await subject.dispose();
-
-    // output path is gone
-    expect(() => subject.read()).to.throw(/ENOENT/);
   });
 });

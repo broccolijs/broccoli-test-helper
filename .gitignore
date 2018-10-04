@@ -3,3 +3,4 @@
 *.log
 /.nyc_output/
 /coverage/
+/tests/multidep_modules/

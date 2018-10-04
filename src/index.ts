@@ -40,7 +40,7 @@ export function fromBuilder(builder: t.Builder): t.Output {
  * @public
  */
 export function createBuilder(outputNode: any): t.Output {
-  const Builder = require("broccoli").Builder;
+  const Builder = require("broccoli").Builder as t.BuilderConstructor;
   return fromBuilder(new Builder(outputNode));
 }
 

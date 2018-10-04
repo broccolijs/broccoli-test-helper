@@ -96,6 +96,9 @@ export interface TempDir extends ReadableDir, Disposable {
  * Interface expected by the output test helper for a builder.
  * @public
  */
+export interface BuilderConstructor {
+  new(node: Tree): Builder;
+}
 export interface Builder {
   /**
    * Path to output of the builder.

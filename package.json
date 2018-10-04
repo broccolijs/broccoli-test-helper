@@ -22,7 +22,7 @@
   "scripts": {
     "build": "yarn build-src && yarn link-self && yarn build-tests",
     "build-src": "tsc",
-    "build-tests": "tsc -p tests/tsconfig.json",
+    "build-tests": "tsc -p tests/tsconfig.json && multidep tests/multidep.json",
     "link-self": "yarn link && yarn link broccoli-test-helper",
     "lint": "tslint -p tsconfig.json && tslint -p tests/tsconfig.json",
     "prepare": "yarn build",
@@ -45,6 +45,7 @@
     "chai": "^4.1.2",
     "concurrently": "^3.6.1",
     "mocha": "^5.2.0",
+    "multidep": "^2.0.2",
     "nyc": "^12.0.2",
     "prettier": "^1.14.2",
     "ts-docs-gen": "^0.2.0",
