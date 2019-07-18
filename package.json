@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@types/tmp": "^0.0.33",
-    "broccoli": "^2.0.0",
+    "broccoli": "^2.0.0 || ^3.1.2",
     "fixturify": "^0.3.2",
     "fs-tree-diff": "^0.5.9",
     "tmp": "^0.0.33",
