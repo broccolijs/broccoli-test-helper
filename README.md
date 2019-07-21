@@ -84,80 +84,73 @@ QUnit.module("Herp2Derp", () => {
 });
 ```
 
-## Mocha and co
+## Mocha
 
-Example works in Node 4+ by using `co` for async/await like generator syntax.
+Example works in Node 8+ by using async/await.
 
 ```js
-"use strict";
-const helper = require("broccoli-test-helper");
-const co = require("co");
-const expect = require("chai").expect;
-const createBuilder = helper.createBuilder;
-const createTempDir = helper.createTempDir;
-const Herp2Derp = require("../index");
+const { createBuilder, createTempDir } = require('broccoli-test-helper');
+const { expect } = require('chai');
+const Herp2Derp = require('../index');
 
-describe("Herp2Derp", function() {
-  it(
-    "should build",
-    co.wrap(function*() {
-      const input = yield createTempDir();
+describe('Herp2Derp', function () {
+  it('should build', async function () {
+    const input = await createTempDir();
+    try {
+      const subject = new Herp2Derp(input.path());
+      const output = createBuilder(subject);
       try {
-        const subject = new Herp2Derp(input.path());
-        const output = createBuilder(subject);
-        try {
-          // INITIAL
-          input.write({
-            "a.herp": "A",
-            lib: {
-              "b.herp": "B",
-              "c.herp": "C",
-            },
-          });
-          yield output.build();
+        // INITIAL
+        input.write({
+          'a.herp': 'A',
+          lib: {
+            'b.herp': 'B',
+            'c.herp': 'C',
+          },
+        });
+        await output.build();
 
-          expect(output.read()).to.deep.equal({
-            "a.derp": "derp A!",
-            lib: {
-              "b.derp": "derp B!",
-              "c.derp": "derp C!",
-            },
-          });
-          expect(output.changes()).to.deep.equal({
-            "a.derp": "create",
-            "lib/": "mkdir",
-            "lib/b.derp": "create",
-            "lib/c.derp": "create",
-          });
+        expect(output.read()).to.deep.equal({
+          'a.derp': 'derp A!',
+          lib: {
+            'b.derp': 'derp B!',
+            'c.derp': 'derp C!',
+          },
+        });
+        expect(output.changes()).to.deep.equal({
+          'a.derp': 'create',
+          'lib/': 'mkdir',
+          'lib/b.derp': 'create',
+          'lib/c.derp': 'create',
+        });
 
-          // UPDATE
-          input.write({
-            "a.herp": "AA", // change
-            lib: null, // rmdir
-          });
-          yield output.build();
+        // UPDATE
+        input.write({
+          'a.herp': 'AA', // change
+          lib: null, // rmdir
+        });
+        await output.build();
 
-          expect(output.read()).to.deep.equal({
-            "a.derp": "derp AA!",
-          });
-          expect(output.changes()).to.deep.equal({
-            "lib/c.derp": "unlink",
-            "lib/b.derp": "unlink",
-            "lib/": "rmdir",
-            "a.derp": "change",
-          });
+        expect(output.read()).to.deep.equal({
+          'a.derp': 'derp AA!',
+        });
+        expect(output.changes()).to.deep.equal({
+          'lib/c.derp': 'unlink',
+          'lib/b.derp': 'unlink',
+          'lib/': 'rmdir',
+          'a.derp': 'change',
+        });
 
-          // NOOP
-          yield output.build();
+        // NOOP
+        await output.build();
 
-          expect(output.changes()).to.deep.equal({});
-        } finally {
-          yield output.dispose();
-        }
+        expect(output.changes()).to.deep.equal({});
       } finally {
-        yield input.dispose();
+        await output.dispose();
       }
-    })
-  );
+    } finally {
+      await input.dispose();
+    }
+  });
 });
 ```
